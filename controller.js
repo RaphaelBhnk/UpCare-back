@@ -623,7 +623,7 @@ const getPsy = async (req, res, next) => {
   }
   result = result.sort((a, b) => b.note - a.note).slice(0, 3);
   console.log(result);
-  res.json({ persons: "result" });
+  res.json({ test: "result" });
 };
 
 const sub = async (req, res, next) => {
