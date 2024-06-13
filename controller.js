@@ -523,8 +523,6 @@ const getPsy = async (req, res, next) => {
   } = req.body;
   var spec = matchSpe(type, feelings, trust, wait, why);
   //Must filter on(code postal, budget, like, remote)
-  res.json({ test: "result" });
-
   let data;
   let tel = "Non";
   let lg = false;
