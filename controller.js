@@ -537,99 +537,104 @@ const getPsy = async (req, res, next) => {
     lg = true;
   }
   try {
-    if (type === "Individuel") {
-      data = await base("Psychologues")
-        .select({
-          filterByFormula: `AND(FIND('${spec}',{Spécialités & Thérapies}) > 0, FIND('${tel}',{Remote}) > 0)`,
-          fields: [
-            "Nom",
-            "Prénom",
-            "Code postal",
-            "Spécialités & Thérapies",
-            "Tarif pour une séance",
-            "Genre",
-            "Acces handicapé",
-            "LGBT+ friendly",
-            "Photo de profil",
-            "Adresse du cabinet",
-            "Lien site UpCare",
-            "Téléconsultation",
-          ],
-        })
-        .firstPage();
-    } else if (type === "Enfant") {
-      data = await base("Psychologues")
-        .select({
-          filterByFormula: `AND(FIND('${spec}', {Spécialités & Thérapies})>0, FIND("Psychologie de l'enfant", {Spécialités & Thérapies})>0, FIND('${tel}',{Remote}) > 0)`,
-          fields: [
-            "Nom",
-            "Prénom",
-            "Code postal",
-            "Spécialités & Thérapies",
-            "Tarif pour une séance",
-            "Genre",
-            "Acces handicapé",
-            "LGBT+ friendly",
-            "Photo de profil",
-            "Adresse du cabinet",
-            "Lien site UpCare",
-            "Téléconsultation",
-          ],
-        })
-        .firstPage();
-    } else {
-      data = await base("Psychologues")
-        .select({
-          filterByFormula: `AND(FIND('${spec}', {Spécialités & Thérapies})>0, FIND("Thérapie de couple", {Spécialités & Thérapies})>0, FIND('${tel}',{Remote}) > 0)`,
-          fields: [
-            "Nom",
-            "Prénom",
-            "Code postal",
-            "Spécialités & Thérapies",
-            "Tarif pour une séance",
-            "Genre",
-            "Acces handicapé",
-            "LGBT+ friendly",
-            "Photo de profil",
-            "Adresse du cabinet",
-            "Lien site UpCare",
-            "Téléconsultation",
-          ],
-        })
-        .firstPage();
+    try {
+      if (type === "Individuel") {
+        data = await base("Psychologues")
+          .select({
+            filterByFormula: `AND(FIND('${spec}',{Spécialités & Thérapies}) > 0, FIND('${tel}',{Remote}) > 0)`,
+            fields: [
+              "Nom",
+              "Prénom",
+              "Code postal",
+              "Spécialités & Thérapies",
+              "Tarif pour une séance",
+              "Genre",
+              "Acces handicapé",
+              "LGBT+ friendly",
+              "Photo de profil",
+              "Adresse du cabinet",
+              "Lien site UpCare",
+              "Téléconsultation",
+            ],
+          })
+          .firstPage();
+      } else if (type === "Enfant") {
+        data = await base("Psychologues")
+          .select({
+            filterByFormula: `AND(FIND('${spec}', {Spécialités & Thérapies})>0, FIND("Psychologie de l'enfant", {Spécialités & Thérapies})>0, FIND('${tel}',{Remote}) > 0)`,
+            fields: [
+              "Nom",
+              "Prénom",
+              "Code postal",
+              "Spécialités & Thérapies",
+              "Tarif pour une séance",
+              "Genre",
+              "Acces handicapé",
+              "LGBT+ friendly",
+              "Photo de profil",
+              "Adresse du cabinet",
+              "Lien site UpCare",
+              "Téléconsultation",
+            ],
+          })
+          .firstPage();
+      } else {
+        data = await base("Psychologues")
+          .select({
+            filterByFormula: `AND(FIND('${spec}', {Spécialités & Thérapies})>0, FIND("Thérapie de couple", {Spécialités & Thérapies})>0, FIND('${tel}',{Remote}) > 0)`,
+            fields: [
+              "Nom",
+              "Prénom",
+              "Code postal",
+              "Spécialités & Thérapies",
+              "Tarif pour une séance",
+              "Genre",
+              "Acces handicapé",
+              "LGBT+ friendly",
+              "Photo de profil",
+              "Adresse du cabinet",
+              "Lien site UpCare",
+              "Téléconsultation",
+            ],
+          })
+          .firstPage();
+      }
+    } catch (error) {
+      console.log(error);
     }
+    let result = [];
+    for (let prop in data) {
+      let note = 0;
+      delete data[prop]._table;
+      delete data[prop]._rawJson;
+      delete data[prop].id;
+      if (data[prop].fields["Tarif pour une séance"] <= budget) {
+        note += 5;
+      }
+      if (data[prop].fields["Code postal"] === postal) {
+        note += 4;
+      }
+      if (data[prop].fields["Genre"] === like) {
+        note += 3;
+      }
+      if (data[prop].fields["Acces handicapé"] === handi) {
+        note += 2;
+      }
+      if (data[prop].fields["LGBT+ friendly"] === lg) {
+        note += 1;
+      }
+      data[prop].fields.note = note;
+      result.push(data[prop].fields);
+    }
+    console.log("Resultat:", result); // Log the incoming request body
+
+    result = result.sort((a, b) => b.note - a.note).slice(0, 3);
+    console.log(result);
+    res.json({ test: "result" });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-  let result = [];
-  for (let prop in data) {
-    let note = 0;
-    delete data[prop]._table;
-    delete data[prop]._rawJson;
-    delete data[prop].id;
-    if (data[prop].fields["Tarif pour une séance"] <= budget) {
-      note += 5;
-    }
-    if (data[prop].fields["Code postal"] === postal) {
-      note += 4;
-    }
-    if (data[prop].fields["Genre"] === like) {
-      note += 3;
-    }
-    if (data[prop].fields["Acces handicapé"] === handi) {
-      note += 2;
-    }
-    if (data[prop].fields["LGBT+ friendly"] === lg) {
-      note += 1;
-    }
-    data[prop].fields.note = note;
-    result.push(data[prop].fields);
-  }
-  console.log("Resultat:", result); // Log the incoming request body
-
-  result = result.sort((a, b) => b.note - a.note).slice(0, 3);
-  console.log(result);
-  res.json({ test: "result" });
 };
 
 const sub = async (req, res, next) => {
