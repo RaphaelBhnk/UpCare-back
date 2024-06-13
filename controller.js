@@ -521,7 +521,11 @@ const getPsy = async (req, res, next) => {
     wait,
     why,
   } = req.body;
+  console.log("Request body:", req.body); // Log the incoming request body
+
   var spec = matchSpe(type, feelings, trust, wait, why);
+  console.log("Spec:", spec); // Log the incoming request body
+
   //Must filter on(code postal, budget, like, remote)
   let data;
   let tel = "Non";
@@ -621,6 +625,8 @@ const getPsy = async (req, res, next) => {
     data[prop].fields.note = note;
     result.push(data[prop].fields);
   }
+  console.log("Resultat:", result); // Log the incoming request body
+
   result = result.sort((a, b) => b.note - a.note).slice(0, 3);
   console.log(result);
   res.json({ test: "result" });
