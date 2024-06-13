@@ -18,6 +18,3 @@ app.use((req, res, next) => {
 });
 
 app.use("", routeRoutes);
-app.get("/version", (req, res) => {
-  res.json({ version: "1.0.1" }); // Update this with each deployment
-});
